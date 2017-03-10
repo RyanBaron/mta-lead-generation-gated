@@ -1,6 +1,6 @@
 <?php
 
-define('MTA_LEADGENGATED_URL_PATH', plugins_url().'/mta-leadgengated');
+define('MTA_LEADGENGATED_URL_PATH', plugins_url().'/mta-lead-generation-gated');
 define('MTA_LEADGENGATED_DIR_PATH', plugin_dir_path(__FILE__) );
 /**
  * The plugin bootstrap file
