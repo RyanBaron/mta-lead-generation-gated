@@ -26,12 +26,11 @@
  */
 
 // If uninstall not called from WordPress, then exit.
-$plugin_file = 'mta-lead-genration-gated/mta-leadgengated.php';
-$checked = isset($_REQUEST['checked']) ? $_REQUEST['checked'] : '';
-
-if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) || !in_array('mta-lead-generation-gated/mta-leadgengated.php', $checked)) {
-  exit;
-}
+/*
+ * Uninstall plugin
+ */
+if ( !defined( 'WP_UNINSTALL_PLUGIN' ) )
+  exit ();
 
 /* time to clean up!! */
 
