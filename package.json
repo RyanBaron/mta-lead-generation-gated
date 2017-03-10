@@ -1,0 +1,42 @@
+{
+  "name": "MTAPlugin",
+  "version": "1.0.0",
+  "author": "Ryan Baron <ryan@madtownagency.com>",
+  "homepage": "https://madtownagency.com/",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/RyanBaron/wp-exitintentcta.git"
+  },
+  "bugs": {
+    "url": "https://github.com/RyanBaron/wp-exitintentcta/issues"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "http://opensource.org/licenses/MIT"
+    }
+  ],
+  "engines": {
+    "node": ">= 4.5"
+  },
+  "devDependencies": {
+    "browserslist": "^1.7.1",
+    "del": "^2.2.2",
+    "gulp": "^3.9.1",
+    "gulp-autoprefixer": "^3.1.1",
+    "gulp-concat": "^2.6.1",
+    "gulp-cssnano": "^2.1.0",
+    "gulp-jshint": "^2.0.4",
+    "gulp-sass": "^3.1.0",
+    "gulp-scss-lint": "^0.4.0",
+    "gulp-sourcemaps": "^2.4.1",
+    "gulp-uglify": "^2.0.1",
+    "jshint": "^2.9.4",
+    "jshint-stylish": "^2.2.1",
+    "run-sequence": "^1.2.2"
+  },
+  "dependencies": {
+    "gulp-scss-lint-stylish": "^1.0.1"
+  }
+}

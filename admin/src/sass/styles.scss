@@ -1,0 +1,74 @@
+/**
+* All of the CSS for your admin-specific functionality should be
+* included in this file.
+*/
+
+//admin options page
+#mta_leadgengated_options_page {
+
+  .help-list {
+    li {
+      .screenshot-wrapper {
+        width:600px;
+        max-width: 100%;
+        display: none;
+        position: relative;
+        padding: 5px 10px;
+        background: white;
+        margin: 10px 0;
+
+        img {
+          max-width: 100%;
+        }
+      }
+      .hide-screenshot {
+        color: red;
+        float: right;
+        text-decoration: none;
+        font-weight: bold;
+        font-size: 1.5rem;
+
+        span {
+          visibility: hidden;
+          font-size: 1rem;
+          vertical-align: top;
+        }
+      }
+      .screenshot-img-wrapper {
+        clear: both;
+        padding: 10px 0 0;
+      }
+      &.show-screenshot {
+        .screenshot-wrapper {
+          display: block;
+        }
+        .hide-screenshot {
+          color: red;
+          float: right;
+
+          &:hover {
+            span {
+              visibility: visible;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+.mta-leadgen-metabox {
+  .meta-input,
+  .wp-editor-wrap {
+    margin-bottom: 1rem;
+  }
+  .meta-input {
+    label {
+      font-weight: bold;
+    }
+    input, select {
+      width: 300px;
+      max-width: 100%;
+    }
+  }
+}

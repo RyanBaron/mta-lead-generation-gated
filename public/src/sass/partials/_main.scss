@@ -1,0 +1,53 @@
+//admin header notice displayed on the single-gated-content (admin only)
+.gated-content-admin-notice {
+  background-color: $bg_red;
+  text-align: center;
+  color: $text_white;
+  padding: 5px;
+
+  a {
+    color: $text_gray;
+
+    &:hover {
+      color: $text_white;
+    }
+  }
+}
+
+//admin styling displayed on the single-gated-content (admin only)
+#gated_content_wrapper {
+  &.single-gated-content-admin {
+    .gforms_confirmation_message {
+      background: green;
+      display: none;
+    }
+    .admin-headline {
+      background-color: $bg_red;
+      color: $text_white;
+      margin: 0;
+      padding: 5px;
+      font-size: 1rem;
+
+      &.public {
+        background-color: $bg_green;
+      }
+    }
+    .gated-content-public {
+      border:1px solid $border_green;
+      padding: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    .gated-content-private {
+      border:1px solid $border_red;
+      padding: 0.5rem;
+      margin-bottom: 1rem;
+    }
+  }
+}
+
+//hide the gravity form thank you message
+#gated_form_wrapper {
+  .gforms_confirmation_message {
+    display: none; //set to display none to prevent gform thank you message from showing briefly before being replaced by ajax
+  }
+}

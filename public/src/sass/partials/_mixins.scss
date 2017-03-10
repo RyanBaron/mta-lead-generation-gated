@@ -1,0 +1,29 @@
+@mixin restrictAnimation($timing:0.75s,$anStyle:ease-in-out) {
+  animation: display-none-transition $timing*1.5 $anStyle;
+
+  .mta-leadgengated-inside {
+    animation: display-zoom-transition $timing $anStyle;
+  }
+}
+
+@keyframes display-none-transition {
+  0% {
+    display: none;
+    opacity: 0;
+  }
+  100% {
+    display: block;
+    opacity: 1;
+  }
+}
+
+@keyframes display-zoom-transition {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
