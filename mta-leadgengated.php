@@ -78,10 +78,9 @@ function run_mta_leadgengated() {
 
 //https://codex.wordpress.org/Creating_Tables_with_Plugins
 register_activation_hook( __FILE__, 'mta_leadgengated_install' );
-//register_activation_hook( __FILE__, 'mta_leadgengated_install_data' );
 
 global $mta_leadgengated_db_version;
-$mta_leadgengated_db_version = '0.9.0';
+$mta_leadgengated_db_version = '1.0.0';
 
 function mta_leadgengated_install() {
   global $mta_leadgengated_db_version;
@@ -122,46 +121,10 @@ function mta_leadgengated_install() {
          KEY gated_id (gated_id)
          )
          COLLATE {$wpdb_collate}";
-  /*
-  $sql =
-    "CREATE TABLE {$access_table} (
-         id mediumint(10) unsigned NOT NULL auto_increment,
-         uuid varchar(255) NOT NULL,
-         gated_id mediumint(10) NOT NULL,
-         access_id mediumint(10) NULL,
-         access_until TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-         created_on TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-         last_access_on TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-         PRIMARY KEY  (id),
-         KEY uuid (uuid),
-         KEY gated_id (gated_id)
-         )
-         COLLATE {$wpdb_collate}";
-  */
 
   dbDelta( $sql );
 
-  //add_option( 'mta_leadgengated_db_version', $mta_leadgengated_db_version );
+  add_option( 'mta_leadgengated_db_version', $mta_leadgengated_db_version );
 }
-
-/*
-function mta_leadgengated_install_data() {
-  global $wpdb;
-
-  $welcome_name = 'Mr. WordPress';
-  $welcome_text = 'Congratulations, you just completed the installation!';
-
-  $table_name = $wpdb->prefix . 'liveshoutbox';
-
-  $wpdb->insert(
-    $table_name,
-    array(
-    'time' => current_time( 'mysql' ),
-    'name' => $welcome_name,
-    'text' => $welcome_text,
-  )
-  );
-}
-*/
 
 run_mta_leadgengated();
