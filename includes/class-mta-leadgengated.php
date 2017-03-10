@@ -68,7 +68,7 @@ class Mta_leadgengated {
    */
   public function __construct() {
 
-    $this->plugin_name = 'mta-leadgengated';
+    $this->plugin_name = 'mta-lead-generation-gated';
     $this->version = '1.0.0';
 
     $this->load_dependencies();

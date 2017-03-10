@@ -60,7 +60,6 @@
     $.MTALeadGenGated.prototype = {
 
       init: function () {
-        //this.date = new Date().getTime();
         //`this` references the instance object inside of an instace's method,
         //however `this` is set to reference a DOM element inside jQuery event
         //handler functions' scope. So we take advantage of JS's lexical scope
@@ -267,8 +266,7 @@
                     that.triggerAnalyticsEvent('Gated Content', 'View (Gated Form) - ' + response.analytics.post_title, uuid, 0);
                   }
                 }
-
-                console.log(response.type);
+                //log error to console
                 console.log(response);
               }
             }
@@ -277,13 +275,10 @@
       }
     };
 
-      //if the '#mta_leadgenpopup_wrapper' item exists on the page initialize the exitintent
+    //if the '#gated_form_wrapper' item exists on the page initialize the exitintent
     if ( $( "#gated_form_wrapper" ).length ) {
       var leadgengated = new $.MTALeadGenGated($("#gated_form_wrapper"));
       leadgengated.init();
-
     }
-
   });
-
 })( jQuery );

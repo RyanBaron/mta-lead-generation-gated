@@ -31,7 +31,7 @@ $admin_class  = $is_admin ? 'single-gated-content-admin' : ''
 
         <div id="gated_content_wrapper" class="<?php print $admin_class ?>">
           <?php if($public_content) { ?>
-            <?php ($is_admin) ? print "<h3 class='admin-headline public'>" . __( "Public content displayed on page load.", "mta-leadgenpopup" ) ."</h3>" : ""; ?>
+            <?php ($is_admin) ? print "<h3 class='admin-headline public'>" . __( "Public content displayed on page load.", "mta-leadgengated" ) ."</h3>" : ""; ?>
             <div class="gated-content-public">
               <?php print $public_content; ?>
             </div>
@@ -44,7 +44,7 @@ $admin_class  = $is_admin ? 'single-gated-content-admin' : ''
             print "<div>Please select a valid form.</div>";
           }?>
 
-          <?php ($is_admin) ? print "<h3 class='admin-headline private'>" . __( "Private content displayed after successful form submission.", "mta-leadgenpopup" ) ."</h3>" : ""; ?>
+          <?php ($is_admin) ? print "<h3 class='admin-headline private'>" . __( "Private content displayed after successful form submission.", "mta-leadgengated" ) ."</h3>" : ""; ?>
           <div class="gated-content-private">
             <?php print $private_content; ?>
           </div>

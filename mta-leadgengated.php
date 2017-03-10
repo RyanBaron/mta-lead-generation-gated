@@ -18,7 +18,7 @@ define('MTA_LEADGENGATED_DIR_PATH', plugin_dir_path(__FILE__) );
  * Plugin Name:       MTA Lead Generation Gated
  * Plugin URI:        http://www.madtownagency.com/
  * Description:       This plugin allows admins to hide content on a page that is only displayed after a user fills out a form, granting them access.
- * Version:           1.0.2
+ * Version:           1.0.0
  * Author:            Ryan Baron
  * Author URI:        http://www.madtownagency.com
  * License:           GPL-2.0+
