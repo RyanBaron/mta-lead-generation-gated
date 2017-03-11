@@ -206,42 +206,42 @@ class Mta_leadgengated_Public {
         $update_access = $wpdb->update(
           $wpdb->prefix . 'mta_leadgen_user_access',
           array(
-          'last_access_on' => $now,
-          'access_until' => $access_until,
-          'access_id' => $access_id,
-        ),
+            'last_access_on' => $now,
+            'access_until' => $access_until,
+            'access_id' => $access_id,
+          ),
           array(
-          'uuid' => $uuid,
-          'gated_id' => $gated_id,
-        ),
+            'uuid' => $uuid,
+            'gated_id' => $gated_id,
+          ),
           array(
-          '%d',
-          '%d',
-          '%d',
-          '%s',
-          '%d',
-        )
+            '%d',
+            '%d',
+            '%d',
+            '%s',
+            '%d',
+          )
         );
-      } else {
+      }
+      else {
         $update_access = $wpdb->update(
           $wpdb->prefix . 'mta_leadgen_user_access',
           array(
-          'last_access_on' => $now,
-          'access_id' => $access_id,
-        ),
+            'last_access_on' => $now,
+            'access_id' => $access_id,
+          ),
           array(
-          'uuid' => $uuid,
-          'gated_id' => $gated_id,
-        ),
+            'uuid' => $uuid,
+            'gated_id' => $gated_id,
+          ),
           array(
-          '%d',
-          '%d',
-          '%s',
-          '%d',
-        )
+            '%d',
+            '%d',
+            '%s',
+            '%d',
+          )
         );
       }
-
 
       return $update_access;
     }

@@ -143,6 +143,67 @@ class Mta_LeadGen_Gated_Content_Admin {
     return $original_template;
   }
 
+
+  /**
+   * The allowed tags for various field types
+   *
+   * @since   1.0.1
+   * @param   string    $type     The type of allowed field tags
+   *
+   * return   an array of tags allowed for field input
+   */
+  public function get_allowed_field_tags($type = '') {
+    switch($type) {
+      case 'textarea':
+        return array(
+          'p' => array(
+          'class' => array(),
+        ),
+          'strong' => array(),
+          'br' => array(),
+          'em' => array(),
+          'span' => array(
+          'class' => array()
+        ),
+          'ul' => array(
+          'class' => array()
+        ),
+          'ol' => array(
+          'class' => array()
+        ),
+          'li' => array(
+          'class' => array()
+        ),
+          'h1' => array(
+          'class' => array()
+        ),
+          'h2' => array(
+          'class' => array()
+        ),
+        );
+        break;
+
+      case 'text':
+        return array(
+          'strong' => array(),
+          'em' => array(),
+          'i' => array(
+          'class' => array(),
+          'aria-hidden' => array(),
+        ),
+          'span' => array(
+          'class' => array(),
+        ),
+        );
+        break;
+
+      default:
+        return array();
+        break;
+    }
+    return array();
+  }
+
   /**
    * The options select field values
    *
@@ -153,9 +214,15 @@ class Mta_LeadGen_Gated_Content_Admin {
    */
   public function get_select_values($type) {
     switch($type) {
+      case 'content_align':
+        return array(
+          'text-left' => __("Left",  'mta-leadgengated'),
+          'text-center' => __("Center",  'mta-leadgengated'),
+        );
+        break;
       case 'form_type':
         return array(
-          'gform' => __("Gravity Forms ",  'mta-leadgengated'),
+          'gform' => __("Gravity Forms",  'mta-leadgengated'),
         );
         break;
 
@@ -279,6 +346,13 @@ class Mta_LeadGen_Gated_Content_Admin {
     $id = isset($atts['gated_id']) && !empty($atts['gated_id']) ? $atts['gated_id'] : 0;
     $gated_post = get_post( $id );
     $post_type = $gated_post->post_type;
+
+    $align         = get_post_meta($id, '_mta_leadgen_gated_form_align', true);
+    $superheadline = get_post_meta($id, '_mta_leadgen_gated_form_superheadline', true);
+    $headline      = get_post_meta($id, '_mta_leadgen_gated_form_headline', true);
+    $subheadline   = get_post_meta($id, '_mta_leadgen_gated_form_subheadline', true);
+    $text          = get_post_meta($id, '_mta_leadgen_gated_form_text', true);
+
     /* $ty_display     = get_post_meta($id, '_mta_leadgen_gated_ty_display', true);*/
 
     //if the shortcode does not have a gated id, let the admin user know
@@ -313,21 +387,38 @@ class Mta_LeadGen_Gated_Content_Admin {
       }
     }
 
+    //build the form header html
+    $headline_html  = "";
+    $headline_html .= !empty($superheadline) ? "<span class='superheadline'>$superheadline</span>" : "";
+    $headline_html .= !empty($headline) ? $headline : "";
+    $headline_html .= !empty($subheadline) ? "<span class='subheadline'>$subheadline</span>" : "";
+
+    //wrap the content headline html
+    $headline_html = !empty($headline_html) ? "<h2 class='gated-form-headline'>$headline_html</h2>" : "";
+    $form_header = isset($text) ? '<div class="gated-form-header '.$align.'">' . $headline_html . '<div class="text">' . $text . '</div>' : '<div class="gated-form-header">' . $headline_html . '</div>';
+
     //all items have passed validation, show the form on the page.
     //valid post, valid gated_content post, gravity form selected on the gated content page is valid
-    $ret = GFFormDisplay::get_form($gform_id, false, false, false, array('gated_content' => $id), true, 999);
-    $gated_content        = get_post_meta($id, '_mta_leadgen_gated_public_content', true );
+    $ret            = GFFormDisplay::get_form($gform_id, false, false, false, array('gated_content' => $id), true, 999);
+    $gated_content  = get_post_meta($id, '_mta_leadgen_gated_public_content', true );
+
     /*
     //this is temporarly disabled as we are not using the thank you dispaly option yet
     $ret = '<div id="gated_content_wrapper"><div class="gated-content-public">' . $gated_content . '</div><div id="gated_form_wrapper" class="' . $ty_display . '" data-ty-display="' . $ty_display . '" data-gated-id="' . $id . '" data-access-id="' . $post->ID . '">' . $ret . '</div></div>';
     */
+
     $ret = '
       <div id="gated_content_wrapper">
         <div class="gated-content-public">' . $gated_content . '</div>
-        <div id="gated_form_wrapper" data-gated-id="' . $id . '" data-access-id="' . $post->ID . '">' . $ret . '</div>
+        <div id="gated_form_wrapper" data-gated-id="' . $id . '" data-access-id="' . $post->ID . '">'. $form_header . $ret . '</div>
       </div>';
 
     return $ret;
+
+    /*
+
+
+    */
   }
 
   /**
@@ -425,6 +516,13 @@ class Mta_LeadGen_Gated_Content_Admin {
       add_meta_box('mta-gated_content-public',
                    __('Public Content'),
                    array($this, 'mta_gated_content_public_meta_box_function'),
+                   $post_type,
+                   'normal',
+                   'high');
+
+      add_meta_box('mta-gated_content-form',
+                   __('Form Content'),
+                   array($this, 'mta_gated_content_form_meta_box_function'),
                    $post_type,
                    'normal',
                    'high');
@@ -686,37 +784,86 @@ class Mta_LeadGen_Gated_Content_Admin {
     echo "<div class='meta-item'><strong>[mta_gated_content gated_id='$post_id']</strong></div>";
   }
 
-
   public function mta_gated_content_public_meta_box_function($post) {
+    wp_nonce_field('mta_gated_content_post_nonce_check', 'mta_gated_content_post_nonce_check_value');
     $mta_leadgen_gated_public_content        = get_post_meta($post->ID, '_mta_leadgen_gated_public_content', true );
+
     echo '<div class="mta-leadgen-metabox mta-leadgen-gated-content-metabox">';
     echo '<div><p>This content is displayed initially on the page (above the gated content form).</p><p>The user does not need to successfully submit the form to see this content, it will be displayed initially on the page when it loads.  When the form is successfully submitted the <a href="#mta-gated_content-private">Private Content</a> will be appended below this public content.</p></div>';
     wp_editor( $mta_leadgen_gated_public_content, 'mta_leadgen_gated_public_content' );
     echo '</div>';
   }
 
-  public function mta_gated_content_private_meta_box_function($post) {
+  public function mta_gated_content_form_meta_box_function($post) {
     wp_nonce_field('mta_gated_content_post_nonce_check', 'mta_gated_content_post_nonce_check_value');
-    $mta_leadgen_gated_gform_id               = get_post_meta($post->ID, '_mta_leadgen_gated_gform_id', true);
-    $mta_leadgen_gated_access_period          = get_post_meta($post->ID, '_mta_leadgen_gated_access_period', true);
-    $mta_leadgen_gated_private_content        = get_post_meta($post->ID, '_mta_leadgen_gated_private_content', true );
-    /*$mta_leadgen_gated_ty_display             = get_post_meta($post->ID, '_mta_leadgen_gated_ty_display', true);*/
+    $mta_leadgen_gated_access_period      = get_post_meta($post->ID, '_mta_leadgen_gated_access_period', true);
+    $mta_leadgen_gated_form_align         = get_post_meta($post->ID, '_mta_leadgen_gated_form_align', true);
+    $mta_leadgen_gated_form_superheadline = get_post_meta($post->ID, '_mta_leadgen_gated_form_superheadline', true);
+    $mta_leadgen_gated_form_headline      = get_post_meta($post->ID, '_mta_leadgen_gated_form_headline', true);
+    $mta_leadgen_gated_form_subheadline   = get_post_meta($post->ID, '_mta_leadgen_gated_form_subheadline', true);
+    $mta_leadgen_gated_form_text          = get_post_meta($post->ID, '_mta_leadgen_gated_form_text', true);
+    $mta_leadgen_gated_gform_id           = get_post_meta($post->ID, '_mta_leadgen_gated_gform_id', true);
 
     $form_items = [];
     echo '<div class="mta-leadgen-metabox mta-leadgen-gated-content-metabox">';
-    echo '<h3>Private Content</h3>';
-    echo '<div><p>This content is <strong>PRIVATE</strong>, and not displayed on the page until after the user successfully submits the form.</p><p>Once the from is successfully submitted it will be replaced with this private content.</p></div>';
-    wp_editor( $mta_leadgen_gated_private_content, 'mta_leadgen_gated_private_content' );
+    echo '<h3>Form Content</h3>';
+    echo '<div><p>The form content is displayed below the public content and is replaced with the private content upon successful submission of the form.</p></div>';
     echo '</div>';
 
-    //
+    $form_align = $this->get_select_values('content_align');
+    if(is_array($form_align) && !empty($form_align)) {
+      $form_align_select = '<select name="mta_leadgen_gated_form_align" id="mta_leadgen_gated_form_align">';
+      foreach( $form_align as $value => $label ):
+      $form_align_select .= '<option value="' . $value . '" ' . selected( $mta_leadgen_gated_form_align, $value, false ) .' >' . $label . '</option>';
+      endforeach;
+      $form_align_select .= '</select>';
+
+      $form_items['form_align_select'] = array(
+        'wrapper_class' => 'meta-input',
+        'field_item' => $form_align_select,
+        'field_label'   => '<label for="mta_leadgen_gated_form_align">'.__('Form header align', 'mta-leadgengated') .'<br></label>',
+      );
+    }
+
+    $form_superheadline = '<input name="mta_leadgen_gated_form_superheadline" id="mta_leadgen_gated_form_superheadline" value="'.$mta_leadgen_gated_form_superheadline.'">';
+    $form_items['superheadline'] = array(
+      'wrapper_class' => 'meta-input',
+      'field_item'    => $form_superheadline,
+      'field_label'   => '<label for="mta_leadgen_gated_form_superheadline">'. __('Form Super Headline', 'mta-leadgengated') .'<br></label>',
+      'field_desc'    => __('Allowed Tags: span(class), i(class), strong and em','mta-leadgengated'),
+    );
+
+    $form_headline = '<input name="mta_leadgen_gated_form_headline" id="mta_leadgen_gated_form_headline" value="'.$mta_leadgen_gated_form_headline.'">';
+    $form_items['headline'] = array(
+      'wrapper_class' => 'meta-input',
+      'field_item'    => $form_headline,
+      'field_label'   => '<label for="mta_leadgen_gated_form_headline">'. __('Form Headline', 'mta-leadgengated') .'<br></label>',
+      'field_desc'    => __('Allowed Tags: span(class), i(class), strong and em','mta-leadgengated'),
+    );
+
+    $form_subheadline = '<input name="mta_leadgen_gated_form_subheadline" id="mta_leadgen_gated_form_subheadline" value="'.$mta_leadgen_gated_form_subheadline.'">';
+    $form_items['subheadline'] = array(
+      'wrapper_class' => 'meta-input',
+      'field_item'    => $form_subheadline,
+      'field_label'   => '<label for="mta_leadgen_gated_form_subheadline">'. __('Form Sub Headline', 'mta-leadgengated') .'<br></label>',
+      'field_desc'    => __('Allowed Tags: span(class), i(class), strong and em','mta-leadgengated'),
+    );
+
+    $form_text = '<textarea name="mta_leadgen_gated_form_text" id="mta_leadgen_gated_form_text">'.$mta_leadgen_gated_form_text.'</textarea>';
+    $form_items['text'] = array(
+      'wrapper_class' => 'meta-input',
+      'field_item'    => $form_text,
+      'field_label'   => '<label for="mta_leadgen_gated_form_text">'. __('Form Text', 'mta-leadgengated') .'<br></label>',
+      'field_desc'    => __('Allowed Tags: p(class), span(class), ul(class), ol(class), li(class), h1(class), h2(class), i(class), strong, em and br','mta-leadgengated'),
+    );
+
     $forms = RGFormsModel::get_forms( null, 'title' );
     if(is_array($forms) && !empty($forms)) {
       $form_select = '<select name="mta_leadgen_gated_gform_id" id="mta_leadgen_gated_gform_id">';
       $form_select .= '<option id="">None</option>';
       $forms = RGFormsModel::get_forms( null, 'title' );
       foreach( $forms as $form ):
-        $form_select .= '<option value="' . $form->id . '" ' . selected( $mta_leadgen_gated_gform_id, $form->id, false ) .' >' . $form->title . '</option>';
+      $form_select .= '<option value="' . $form->id . '" ' . selected( $mta_leadgen_gated_gform_id, $form->id, false ) .' >' . $form->title . '</option>';
       endforeach;
       $form_select .= '</select>';
 
@@ -727,6 +874,40 @@ class Mta_LeadGen_Gated_Content_Admin {
         'field_desc'    => __('Select the form the user needs to successfully fill out in order to gain access to the private content.','mta-leadgengated'),
       );
     }
+
+    $access_period = $this->get_select_values('access_period');
+    if(is_array($access_period) && !empty($access_period)) {
+      $access_period_select = '<select name="mta_leadgen_gated_access_period" id="mta_leadgen_gated_access_period">';
+      foreach( $access_period as $value => $label ):
+      $access_period_select .= '<option value="' . $value . '" ' . selected( $mta_leadgen_gated_access_period, $value, false ) .' >' . $label . '</option>';
+      endforeach;
+      $access_period_select .= '</select>';
+
+      $form_items['access_period_select'] = array(
+        'wrapper_class' => 'meta-input',
+        'field_item' => $access_period_select,
+        'field_label'   => '<label for="mta_leadgen_gated_access_period">'.__('Access time period', 'mta-leadgengated') .'<br></label>',
+        'field_desc' => __('After a visitor successfully fills out the gated content form, select how long they will have access to the gated content for.','mta-leadgengated'),
+      );
+    }
+
+    include('partials/gated-content-meta-box-display.php');
+
+  }
+
+  public function mta_gated_content_private_meta_box_function($post) {
+    wp_nonce_field('mta_gated_content_post_nonce_check', 'mta_gated_content_post_nonce_check_value');
+    $mta_leadgen_gated_private_content    = get_post_meta($post->ID, '_mta_leadgen_gated_private_content', true );
+    /*$mta_leadgen_gated_ty_display       = get_post_meta($post->ID, '_mta_leadgen_gated_ty_display', true);*/
+
+    $form_items = [];
+    echo '<div class="mta-leadgen-metabox mta-leadgen-gated-content-metabox">';
+    echo '<h3>Private Content</h3>';
+    echo '<div><p>This content is <strong>PRIVATE</strong>, and not displayed on the page until after the user successfully submits the form.</p><p>Once the from is successfully submitted it will be replaced with this private content.</p></div>';
+    wp_editor( $mta_leadgen_gated_private_content, 'mta_leadgen_gated_private_content' );
+    echo '</div>';
+
+
 
     /*
     //temporarly removed and the thank you option has not been fully implemented
@@ -747,6 +928,7 @@ class Mta_LeadGen_Gated_Content_Admin {
     }
     */
 
+    /*
     $access_period = $this->get_select_values('access_period');
     if(is_array($access_period) && !empty($access_period)) {
       $access_period_select = '<select name="mta_leadgen_gated_access_period" id="mta_leadgen_gated_access_period">';
@@ -762,9 +944,10 @@ class Mta_LeadGen_Gated_Content_Admin {
         'field_desc' => __('After a visitor successfully fills out the gated content form, select how long they will have access to the gated content for.','mta-leadgengated'),
       );
     }
+    */
 
   //include the template (which uses the above generated variables $content, $form, $wrapper_classes)
-  include_once('partials/gated-content-meta-box-display.php');
+  //include('partials/gated-content-meta-box-display.php');
   }
 
   /**
@@ -803,6 +986,9 @@ class Mta_LeadGen_Gated_Content_Admin {
         return $post_id;
     }
 
+    $allowed_text     = $this->get_allowed_field_tags('text');
+    $allowed_textarea = $this->get_allowed_field_tags('textarea');
+
     /* OK, its safe for us to save the data now. */
     $mta_leadgen_gated_gform_id = wp_kses( $_POST['mta_leadgen_gated_gform_id'], array() );
     if( isset( $mta_leadgen_gated_gform_id ) )
@@ -819,6 +1005,26 @@ class Mta_LeadGen_Gated_Content_Admin {
     $mta_leadgen_gated_public_content = $_POST['mta_leadgen_gated_public_content'];
     if( isset( $mta_leadgen_gated_public_content ) )
       update_post_meta($post_id, '_mta_leadgen_gated_public_content', $mta_leadgen_gated_public_content);
+
+    $mta_leadgen_gated_form_align = wp_kses( $_POST['mta_leadgen_gated_form_align'], array());
+    if( isset( $mta_leadgen_gated_form_align ) )
+      update_post_meta($post_id, '_mta_leadgen_gated_form_align', $mta_leadgen_gated_form_align);
+
+    $mta_leadgen_gated_form_superheadline = wp_kses( $_POST['mta_leadgen_gated_form_superheadline'], $allowed_text);
+    if( isset( $mta_leadgen_gated_form_superheadline ) )
+      update_post_meta($post_id, '_mta_leadgen_gated_form_superheadline', $mta_leadgen_gated_form_superheadline);
+
+    $mta_leadgen_gated_form_headline = wp_kses( $_POST['mta_leadgen_gated_form_headline'], $allowed_text);
+    if( isset( $mta_leadgen_gated_form_headline ) )
+      update_post_meta($post_id, '_mta_leadgen_gated_form_headline', $mta_leadgen_gated_form_headline);
+
+    $mta_leadgen_gated_form_subheadline = wp_kses( $_POST['mta_leadgen_gated_form_subheadline'], $allowed_text);
+    if( isset( $mta_leadgen_gated_form_subheadline ) )
+      update_post_meta($post_id, '_mta_leadgen_gated_form_subheadline', $mta_leadgen_gated_form_subheadline);
+
+    $mta_leadgen_gated_form_text = wp_kses( $_POST['mta_leadgen_gated_form_text'], $allowed_textarea);
+    if( isset( $mta_leadgen_gated_form_text ) )
+      update_post_meta($post_id, '_mta_leadgen_gated_form_text', $mta_leadgen_gated_form_text);
 
     /*
     $mta_leadgen_gated_ty_display = wp_kses( $_POST['mta_leadgen_gated_ty_display'], array() );
